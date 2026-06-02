@@ -1,0 +1,563 @@
+body {
+    margin: 0;
+    background: #000;
+    color: #f5f5f5;
+    font-family: Arial, "Helvetica Neue", sans-serif;
+}
+
+/* ヘッダー */
+.todo-header {
+    height: 88px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #1f1f1f;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-user-icon {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #f5f5f5;
+    border-radius: 50%;
+}
+
+.header-user-name {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.header-add-button {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #000;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* モーダル背景 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+}
+
+/* モーダル本体 */
+.todo-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 560px;
+    max-width: calc(100% - 40px);
+    transform: translate(-50%, -50%);
+    padding: 32px;
+    background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
+    border: 1px solid #333;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75);
+    z-index: 101;
+}
+
+.todo-modal.is-open,
+.modal-overlay.is-open {
+    display: block;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.modal-close-button {
+    border: none;
+    background: transparent;
+    color: #f5f5f5;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* フォーム */
+.todo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-group label,
+.form-label {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.form-group span {
+    color: #aaa;
+    font-weight: 400;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    background: #0b0b0b;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    color: #f5f5f5;
+    font-size: 15px;
+    outline: none;
+}
+
+/* カレンダーアイコンを白にする */
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.form-group textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #777;
+}
+
+/* 優先度 */
+.todo-priority {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.priority-option {
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    border-right: 1px solid #3a3a3a;
+}
+
+.priority-option:last-child {
+    border-right: none;
+}
+
+.priority-option input {
+    accent-color: #ffffff;
+}
+
+.priority-low span {
+    color: #9be36b;
+}
+
+.priority-medium span {
+    color: #ffbf3f;
+}
+
+.priority-high span {
+    color: #ff5c5c;
+}
+
+/* ボタン */
+.todo-confirm {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding-top: 18px;
+    border-top: 1px solid #333;
+}
+
+.cancel-button,
+.submit-button {
+    min-width: 130px;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background: #1f1f1f;
+    color: #f5f5f5;
+    border: 1px solid #444;
+}
+
+.submit-button {
+    background: #ffffff;
+    color: #000;
+    border: none;
+}
+
+.is-hidden {
+	display: none;
+}
+
+/* ゴミ箱アイコンボタン */
+.task-delete-icon-button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #4a1f1f;
+    border-radius: 10px;
+    background: rgba(255, 77, 77, 0.12);
+    color: #ff6b6b;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.task-delete-icon-button:hover {
+    background: rgba(255, 77, 77, 0.22);
+    border-color: #ff6b6b;
+}
+
+/* 削除確認モーダル背景 */
+.delete-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+}
+
+/* 削除確認モーダル本体 */
+.delete-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 420px;
+    max-width: calc(100% - 40px);
+    transform: translate(-50%, -50%);
+    padding: 28px;
+    background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
+    border: 1px solid #333;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75);
+    z-index: 201;
+}
+
+.delete-modal.is-open,
+.delete-modal-overlay.is-open {
+    display: block;
+}
+
+.delete-modal-title {
+    margin: 0 0 12px;
+    color: #f5f5f5;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.delete-modal-message {
+    margin: 0 0 28px;
+    color: #aaa;
+    font-size: 15px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+}
+
+.delete-cancel-button,
+.delete-confirm-button {
+    min-width: 110px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.delete-cancel-button {
+    background: #1f1f1f;
+    color: #f5f5f5;
+    border: 1px solid #444;
+}
+
+.delete-confirm-button {
+    background: #ff4d4d;
+    color: #ffffff;
+    border: none;
+}
+
+/* 編集アイコンボタン */
+.task-edit-icon-button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #3a3a3a;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #f5f5f5;
+    font-size: 17px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.task-edit-icon-button:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: #777;
+}
+
+/* ゴミ箱アイコンボタン */
+.task-delete-icon-button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #4a1f1f;
+    border-radius: 10px;
+    background: rgba(255, 77, 77, 0.12);
+    color: #ff6b6b;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.task-delete-icon-button:hover {
+    background: rgba(255, 77, 77, 0.22);
+    border-color: #ff6b6b;
+}
+
+/* ==============================
+   編集モーダル背景
+============================== */
+.edit-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+    z-index: 300;
+}
+
+/* ==============================
+   編集モーダル本体
+============================== */
+.edit-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 560px;
+    max-width: calc(100% - 40px);
+    transform: translate(-50%, -50%);
+    padding: 32px;
+    background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
+    border: 1px solid #333;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75);
+    z-index: 301;
+}
+
+/* JSでis-openが付いたら表示 */
+.edit-modal.is-open,
+.edit-modal-overlay.is-open {
+    display: block;
+}
+
+/* ==============================
+   編集モーダルヘッダー
+============================== */
+.edit-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.edit-modal-title {
+    margin: 0;
+    color: #f5f5f5;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.edit-modal-close-button {
+    border: none;
+    background: transparent;
+    color: #f5f5f5;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* ==============================
+   編集フォーム
+============================== */
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* 追加モーダルのform-groupを使い回す想定 */
+.edit-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.edit-form label,
+.edit-form .form-label {
+    margin: 0;
+    color: #f5f5f5;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.edit-form span {
+    color: #aaa;
+    font-weight: 400;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="date"],
+.edit-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    background: #0b0b0b;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    color: #f5f5f5;
+    font-size: 15px;
+    outline: none;
+}
+
+.edit-form textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.edit-form input:focus,
+.edit-form textarea:focus {
+    border-color: #777;
+}
+
+/* カレンダーアイコンを白系にする */
+.edit-form input[type="date"] {
+    color-scheme: dark;
+}
+
+.edit-form input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* ==============================
+   優先度
+============================== */
+.edit-form .todo-priority {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.edit-form .priority-option {
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    border-right: 1px solid #3a3a3a;
+}
+
+.edit-form .priority-option:last-child {
+    border-right: none;
+}
+
+.edit-form .priority-option input {
+    accent-color: #ffffff;
+}
+
+.edit-form .priority-low span {
+    color: #9be36b;
+}
+
+.edit-form .priority-medium span {
+    color: #ffbf3f;
+}
+
+.edit-form .priority-high span {
+    color: #ff5c5c;
+}
+
+/* ==============================
+   編集モーダルボタン
+============================== */
+.edit-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding-top: 18px;
+    border-top: 1px solid #333;
+}
+
+.edit-cancel-button,
+.edit-update-button {
+    min-width: 130px;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.edit-cancel-button {
+    background: #1f1f1f;
+    color: #f5f5f5;
+    border: 1px solid #444;
+}
+
+.edit-cancel-button:hover {
+    background: #2a2a2a;
+}
+
+.edit-update-button {
+    background: #ffffff;
+    color: #000;
+    border: none;
+}
+
+.edit-update-button:hover {
+    background: #e8e8e8;
+}

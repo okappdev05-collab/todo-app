@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>タスク一覧</title>
+
+	<meta name="_csrf" th:content="${_csrf.token}">
+	<meta name="_csrf_header" th:content="${_csrf.headerName}">
+	
+	<link rel="stylesheet" th:href="@{/css/view/todos.css}">
+	<link rel="stylesheet" href="/css/modal/todo.css">
+</head>
+<body>
+	<div class="todo-page">
+		
+		<!-- ヘッダー -->
+		<header class="todo-header">
+			<div class="header-user">
+				<span class="header-user-name" th:text="${userName}">User Name</span>
+			</div>
+			
+			<button type="button" class="header-add-button" id="openAddTaskModal">
+				+ Add Task
+			</button>
+			
+			<form th:action="@{/logout}" method="post" class="logout-form">
+				<button type="submit" class="logout-button">
+					Logout
+				</button>
+			</form>
+			
+		</header>
+		
+		<!-- タスク追加モーダル背景 -->
+		<div class="modal-overlay" id="modalOverlay"></div>
+		
+		<!-- タスク追加モーダル -->
+	    <div class="todo-modal" id="todoModal">
+			<div class="modal-header">
+				<h2>Add Task</h2>
+				<button type="button" class="modal-close-button" id="closeAddTaskModal">✕</button>
+			</div>
+			
+			<form th:action="@{/add}" method="post" class="todo-form">
+				
+				<div class="form-group">
+					<label for="title">Title</label>
+					<input type="text" id="title" name="title" placeholder="Enter task title" required>
+				</div>
+				
+				<div class="form-group">
+					<label for="memo">Description <span>(optional)</span></label>
+					<textarea id="memo" name="memo" placeholder="Enter task description"></textarea>
+				</div>
+				
+				<div class="form-group">
+					<label for="dueDate">Due date<span>(optional)</span></label>
+					<input type="date" id="dueDate" name="dueDate">
+				</div>
+				
+				<div class="form-group">
+					<p class="form-label">Priority</p>
+					
+					<div class="todo-priority">
+						<label class="priority-option priority-low">
+							<input type="radio" name="priority" value="LOW">
+							<span>Low</span>
+						</label>
+
+						<label class="priority-option priority-medium">
+							<input type="radio" name="priority" value="MEDIUM" checked>
+							<span>Medium</span>
+						</label>
+						
+						<label class="priority-option priority-high">
+							<input type="radio" name="priority" value="HIGH">
+							<span>High</span>
+						</label>
+					</div>
+				</div>
+				
+				<div class="todo-confirm">
+					<button type="button" class="cancel-button" id="cancelAddTaskModal">
+						Cancel
+					</button>
+					
+					<button type="submit" class="submit-button">
+						Add Task
+					</button>
+				</div>
+			</form>
+	    </div>
+		
+		<!-- タスク編集モーダル背景 -->
+		<div class="edit-modal-overlay" id="editModalOverlay"></div>
+		
+		<!-- タスク編集モーダル -->
+		<div class="edit-modal" id="editModal">
+			<div class="edit-modal-header">
+				<h2 class="edit-modal-title">Edit Task</h2>
+				
+				<button type="button" class="edit-modal-close-button" id="closeEditButton">
+					✕
+				</button>
+			</div>
+			
+			<form class="edit-form" id="editTaskForm">
+				
+				<!-- 編集対象のTodo IDを保持する -->
+				<input type="hidden" id="editTodoId" name="todoId">
+				
+				<div class="form-group">
+					<label for="editTitle">Title</label>
+					<input
+						type="text"
+						id="editTitle"
+						name="title"
+						placeholder="Enter task title"
+						required>
+				</div>
+				
+				<div class="form-group">
+					<label for="editMemo">Description<span>(optional)</span></label>
+					<textarea
+						id="editMemo"
+						name="memo"
+						placeholder="Enter task description">
+					</textarea>
+				</div>
+				
+				<div class="form-group">
+					<label for="editDueDate">Due date<span>(optional)</span></label>
+					<input
+						type="date"
+						id="editDueDate"
+						name="dueDate">
+					</input>
+				</div>
+				
+				<div class="form-group">
+					<p class="form-label">Priority</p>
+					
+					<div class="todo-priority">
+						<label class="priority-option priority-low">
+							<input type="radio" name="edit-priority" value="LOW">
+							<span>Low</span>
+						</label>
+						
+						<label class="priority-option priority-medium">
+							<input type="radio" name="edit-priority" value="MEDIUM">
+							<span>Medium</span>
+						</label>
+						
+						<label class="priority-option priority-high">
+							<input type="radio" name="edit-priority" value="HIGH">
+							<span>High</span>
+						</label>
+					</div>
+				</div>
+				
+				<div class="edit-modal-actions">
+					<button type="button" class="edit-cancel-button" id="cancelEditButton">
+						Cancel
+					</button>
+					
+					<button type="submit" class="edit-update-button" id="updateEditButton">
+						Update
+					</button>
+				</div>
+			</form>
+		</div>
+		
+		<!-- タスク削除モーダル背景 -->
+		<div class="delete-modal-overlay" id="deleteModalOverlay"></div>
+		
+		<!-- タスク削除モーダル -->
+		<div class="delete-modal" id="deleteModal">
+			<h2 class="delete-modal-title">Delete Task?</h2>
+			
+			<p class="delete-modal-message">
+				This task will be permanently deleted.
+			</p>
+			
+			<div class="delete-modal-actions">
+				<button type="button" class="delete-cancel-button" id="cancelDeleteButton">
+					Cancel
+				</button>
+				
+				<button type="button" class="delete-confirm-button" id="confirmDeleteButton">
+					Delete
+				</button>
+			</div>
+		</div>
+		
+		<main class="todo-main">
+			
+			<!-- タイトル -->
+			<section class="todo-title-section">
+				<h1 class="todo-title">All Tasks</h1>
+				<p class="todo-subtitle">Manage your tasks and priorities</p>
+			</section>
+			
+			<!-- フィルター -->
+			<section class="priority-filter-section">
+				<div class="priority-filter">
+					
+					<button type="button" class="priority-filter-item is-active" data-priority="ALL">
+						<span class="priority-filter-dot"></span>
+						<span class="priority-filter-label">All</span>
+					</button>
+					
+					<span class="priority-filter-line"></span>
+					
+					<button type="button" class="priority-filter-item" data-priority="LOW">
+						<span class="priority-filter-dot"></span>
+						<span class="priority-filter-label">Low</span>
+					</button>
+					
+					<span class="priority-filter-line"></span>
+					
+					<button type="button" class="priority-filter-item" data-priority="MEDIUM">
+						<span class="priority-filter-dot"></span>
+						<span class="priority-filter-label">Medium</span>
+					</button>
+					
+					<span class="priority-filter-line"></span>
+					
+					<button type="button" class="priority-filter-item" data-priority="HIGH">
+						<span class="priority-filter-dot"></span>
+						<span class="priority-filter-label">High</span>
+					</button>
+
+				</div>
+			</section>
+			
+			<!-- タスク一覧 -->
+			<section class="task-list-section">
+				<div class="task-list">
+					
+					<!-- Todoが0件の場合 -->
+					<p class="empty-message" id="emptyMessage" th:classappend="${#lists.isEmpty(todos)} ? '' : ' is-hidden'">
+						No tasks yet.
+					</p>
+					
+					<!-- Todo一覧 -->
+					<article class="task-card"
+						 th:each="todo : ${todos}"
+						 th:attr="
+						 	data-priority=${todo.priority},
+							data-todo-id=${todo.id},
+							data-title=${todo.title},
+							data-memo=${todo.memo},
+							data-due-date=${todo.dueDate}
+						"
+						 th:classpappend="${todo.state} ? ' is-completed' : ''">
+						<div class="task-check">
+							<input type="checkbox"
+								 class="task-checkbox"
+								 th:checked="${todo.state}">
+						</div>
+						
+						<div class="task-content">
+							<h2 class="task-title" th:text="${todo.title}"></h2>
+							<p class="task-memo" th:text="${todo.memo}"></p>
+						</div>
+						
+						<div class="task-info">
+							<span class="task-date" th:text="${todo.dueDate}"></span>
+							
+							<span
+								class="task-priority"
+								th:text="${todo.priority}"
+								th:classappend="${todo.priority.name() == 'LOW'} ? ' task-priority-low' : (${todo.priority.name() == 'MEDIUM'} ? ' task-priority-medium' : ' task-priority-high')">
+							</span>
+
+							<button type="button" class="task-edit-icon-button" aria-label="Edit task">✏️</button>
+							
+							<button type="button" class="task-delete-icon-button" aria-label="Delete task">🗑</button>
+						</div>
+					</article>
+				</div>
+			</section>
+		</main>
+		
+	</div>
+	
+	<script th:src="@{/js/todo.js}"></script>
+</body>
+</html>
