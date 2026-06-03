@@ -23,12 +23,6 @@
 				+ Add Task
 			</button>
 			
-			<form th:action="@{/logout}" method="post" class="logout-form">
-				<button type="submit" class="logout-button">
-					Logout
-				</button>
-			</form>
-			
 		</header>
 		
 		<!-- タスク追加モーダル背景 -->
@@ -194,44 +188,48 @@
 		
 		<main class="todo-main">
 			
-			<!-- タイトル -->
-			<section class="todo-title-section">
-				<h1 class="todo-title">All Tasks</h1>
-				<p class="todo-subtitle">Manage your tasks and priorities</p>
-			</section>
-			
-			<!-- フィルター -->
-			<section class="priority-filter-section">
-				<div class="priority-filter">
-					
-					<button type="button" class="priority-filter-item is-active" data-priority="ALL">
-						<span class="priority-filter-dot"></span>
-						<span class="priority-filter-label">All</span>
-					</button>
-					
-					<span class="priority-filter-line"></span>
-					
-					<button type="button" class="priority-filter-item" data-priority="LOW">
-						<span class="priority-filter-dot"></span>
-						<span class="priority-filter-label">Low</span>
-					</button>
-					
-					<span class="priority-filter-line"></span>
-					
-					<button type="button" class="priority-filter-item" data-priority="MEDIUM">
-						<span class="priority-filter-dot"></span>
-						<span class="priority-filter-label">Medium</span>
-					</button>
-					
-					<span class="priority-filter-line"></span>
-					
-					<button type="button" class="priority-filter-item" data-priority="HIGH">
-						<span class="priority-filter-dot"></span>
-						<span class="priority-filter-label">High</span>
-					</button>
+			<!-- 固定表示エリア -->
+			<div class="todo-fixed-area">
+				
+				<!-- タイトル -->
+				<section class="todo-title-section">
+					<h1 class="todo-title">All Tasks</h1>
+					<p class="todo-subtitle">Manage your tasks and priorities</p>
+				</section>
+				
+				<!-- フィルター -->
+				<section class="priority-filter-section">
+					<div class="priority-filter">
+						
+						<button type="button" class="priority-filter-item is-active" data-priority="ALL">
+							<span class="priority-filter-dot"></span>
+							<span class="priority-filter-label">All</span>
+						</button>
+						
+						<span class="priority-filter-line"></span>
+						
+						<button type="button" class="priority-filter-item" data-priority="LOW">
+							<span class="priority-filter-dot"></span>
+							<span class="priority-filter-label">Low</span>
+						</button>
+						
+						<span class="priority-filter-line"></span>
+						
+						<button type="button" class="priority-filter-item" data-priority="MEDIUM">
+							<span class="priority-filter-dot"></span>
+							<span class="priority-filter-label">Medium</span>
+						</button>
+						
+						<span class="priority-filter-line"></span>
+						
+						<button type="button" class="priority-filter-item" data-priority="HIGH">
+							<span class="priority-filter-dot"></span>
+							<span class="priority-filter-label">High</span>
+						</button>
 
-				</div>
-			</section>
+					</div>
+				</section>
+			</div>
 			
 			<!-- タスク一覧 -->
 			<section class="task-list-section">
@@ -250,9 +248,7 @@
 							data-todo-id=${todo.id},
 							data-title=${todo.title},
 							data-memo=${todo.memo},
-							data-due-date=${todo.dueDate}
-						"
-						 th:classpappend="${todo.state} ? ' is-completed' : ''">
+							data-due-date=${todo.dueDate}">
 						<div class="task-check">
 							<input type="checkbox"
 								 class="task-checkbox"
@@ -281,6 +277,31 @@
 				</div>
 			</section>
 		</main>
+		
+		<footer class="todo-footer">
+			
+			<div class="footer-left">
+				<form th:action="@{/logout}" method="post" class="logout-form">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+						
+						<button type="submit" class="logout-button">
+							Logout
+						</button>
+					
+				</form>
+			</div>
+			
+			<nav class="footer-task-switch">
+				<a th:href="@{/todos}" class="footer-switch-button" th:classappend="${currentPage == 'incomplete'} ? ' is-active' : ''">
+					未完了
+				</a>
+				
+				<a th:href="@{/todos/completed}" class="footer-switch-button" th:classappend="${currentPage == 'completed'} ? ' is-active' : ''">
+					完了
+				</a>
+			</nav>
+
+		</footer>
 		
 	</div>
 	

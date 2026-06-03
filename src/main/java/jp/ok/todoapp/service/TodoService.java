@@ -51,6 +51,16 @@ public class TodoService {
 	}
 	
 	/**
+	 * 指定したユーザーIDの未完了Todoを取得する
+	 */
+	public List<TodoEntity> getTodoListByState(int userId, boolean state) {
+		
+		// 指定ユーザーのTodo一覧を状態別に取得する
+		return todoRepository.findByUserIdAndStateOrderByCreatedAtDesc(userId, state);
+	}
+	
+	
+	/**
 	 * Todoの完了状態を更新する
 	 */
 	public void updateTaskState(int userId, int todoId, boolean state) {

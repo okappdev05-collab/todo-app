@@ -70,13 +70,6 @@ document.addEventListener("DOMContentLoaded", () =>{
 			const todoId = taskCard.dataset.todoId;
 			const checked = checkbox.checked;
 			
-			// 画面表示を切り替える
-			if (checkbox.checked) {
-				taskCard.classList.add("is-completed");
-			} else {
-				taskCard.classList.remove("is-completed");
-			}
-			
 			// CSRFトークンを取得する
 			const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 			const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
@@ -94,19 +87,14 @@ document.addEventListener("DOMContentLoaded", () =>{
 				if (!response.ok) {
 					throw new Error("状態更新に失敗しました。");
 				}
+				
+				// 状態変更に成功したら、現在の一覧からタスクカードを消す
+				taskCard.remove();
 			} catch (error) {
 				console.error(error);
 				
 				// DB更新に失敗したら表示を元に戻す
 				checkbox.checked = !checked;
-				
-				if (checked) {
-					taskCard.classList.remove("is-completed");
-				} else {
-					taskCard.classList.add("is-completed");
-				}
-				
-				alert("タスクの状態更新に失敗しました。");
 			}
 		})
 	});

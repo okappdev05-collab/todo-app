@@ -1,8 +1,61 @@
+html,
+body {
+	height: 100%;
+	overflow: hidden;
+}
+
+/* ページ全体 */
+.todo-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+}
+
+/* ヘッダー */
+.todo-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 60;
+	
+	height: 88px;
+	padding: 0 40px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	
+	background: #0000;
+	border-bottom: 1px solid #1f1f1f;
+	box-sizing: border-box;
+}
+
 /* メインエリア */
 .todo-main {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 48px 40px;
+	position: fixed;
+	top: 88px;
+	left: 50%;
+	transform: translateX(-50%);
+	
+	width: 100%;
+	max-width: 1180px;
+	
+	height: calc(100vh - 88px);
+	padding: 48px 40px 120px;
+	box-sizing: border-box;
+	
+	display: flex;
+	flex-direction: column;
+	
+	background: #000;
+}
+
+/* 固定エリア */
+.todo-fixed-area {
+	flex: 0 0 auto;
+	background: #000;
+	z-index: 10;
 }
 
 /* タイトル */
@@ -77,7 +130,32 @@
 
 /* タスク一覧 */
 .task-list-section {
-    margin-top: 24px;
+    flex: 1;
+	min-height: 0;
+	margin-top: 24px;
+	
+	overflow-y: auto;
+	padding-right: 8px;
+	padding-bottom: 32px;
+}
+
+/* スクロールバー */
+.task-list-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.task-list-section::-webkit-scrollbar-track {
+    background: #0b0b0b;
+    border-radius: 999px;
+}
+
+.task-list-section::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 999px;
+}
+
+.task-list-section::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .task-list {
@@ -175,34 +253,72 @@
     font-size: 15px;
 }
 
-.task-card.is-completed {
-	opacity: 0.45;
-	background: #101010;
+/* フッター */
+.todo-footer {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 50;
+	
+	height: 82px;
+	padding: 0 40px;
+	box-sizing: border-box;
+	
+    display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	background: #000;
+	border-top: 1px solid #1f1f1f;
 }
 
-.task-card.is-completed .task-title,
-.task-card.is-completed .task-memo,
-.task-card.is-completed .task-date {
-    color: #777;
-    text-decoration: line-through;
+/* フッター左側 */
+.footer-left {
+	position: absolute;
+	left: 40px;
+	display: flex;
+	align-items: center;
 }
 
-.task-card.is-completed .task-priority {
-    opacity: 0.6;
-}
-
-.header-actions {
+/* 未完了 / 完了 切り替え */
+.footer-task-switch {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 8px;
+    padding: 6px;
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
 }
 
+.footer-switch-button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #9a9a9a;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.footer-switch-button:hover {
+    color: #ffffff;
+    background: #1a1a1a;
+}
+
+.footer-switch-button.is-active {
+    color: #000;
+    background: #ffffff;
+}
+
+/* Logout */
 .logout-form {
     margin: 0;
 }
 
 .logout-button {
-    padding: 14px 20px;
+    padding: 12px 20px;
     border: 1px solid #3a3a3a;
     border-radius: 10px;
     background: #121212;
@@ -223,22 +339,26 @@
 ============================== */
 @media (max-width: 768px) {
 
+	/* ヘッダー */
+	.todo-header {
+			height: 72px;
+			padding: 0 16px;
+	}
+	
+	.header-user-name {
+	    font-size: 15px;
+	}
+
+	.header-add-button {
+	    padding: 10px 14px;
+	    font-size: 14px;
+	}
+	
+	/* メイン */
     .todo-main {
-        padding: 32px 16px;
-    }
-
-    .todo-header {
-        height: 72px;
-        padding: 0 16px;
-    }
-
-    .header-user-name {
-        font-size: 15px;
-    }
-
-    .header-add-button {
-        padding: 10px 14px;
-        font-size: 14px;
+		top: 72px;
+		height: calc(100vh - 72px);
+        padding: 32px 16px 100px;
     }
 
     .todo-title {
@@ -249,7 +369,7 @@
         font-size: 13px;
     }
 
-    /* フィルターをスマホ幅に合わせる */
+	/* フィルター */
     .priority-filter {
         overflow-x: auto;
         justify-content: flex-start;
@@ -269,6 +389,13 @@
     .priority-filter-label {
         font-size: 13px;
     }
+	
+	/* タスク一覧 */
+    .task-list-section {
+		margin-top: 20px;
+		padding-right: 4px;
+		padding-bottom: 28px;
+	}
 
     /* タスクカードを縦並びにする */
     .task-card {
@@ -363,6 +490,25 @@
 	
 	.header-actions {
 	    gap: 8px;
+	}
+	
+	.todo-footer {
+	    height: 76px;
+		padding: 0 16px;
+	}
+	
+	.footer-left {
+		left: 16px;
+	}
+	
+	.footer-task-switch {
+	    gap: 6px;
+		padding: 5px;
+	}
+
+	.footer-switch-button {
+	    padding: 9px 12px;
+	    font-size: 13px;
 	}
 
 	.logout-button {

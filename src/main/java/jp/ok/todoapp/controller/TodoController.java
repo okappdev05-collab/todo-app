@@ -30,19 +30,18 @@ public class TodoController {
     /**
      * TodoServiceとUserServiceをDIする
      */
-    public TodoController(TodoService todoService, UserService userService) {
+    public TodoController(TodoService todoService,
+    					  UserService userService) {
     	this.todoService = todoService;
     	this.userService = userService;
     }
 
 	/**
-	 * Todo一覧画面を表示する
+	 * 未完了Todo一覧画面を表示する
 	 */
 	@GetMapping("/todos")
-	public String index(
-			Model model,
-			@AuthenticationPrincipal OidcUser oidcUser
-			) {
+	public String index(Model model,
+						@AuthenticationPrincipal OidcUser oidcUser) {
 		
 		// Googleログイン情報から表示画面用のユーザー名を取得する
 		String userName = oidcUser.getAttribute("name");
@@ -53,12 +52,41 @@ public class TodoController {
 		// google_subからusersテーブルのidを取得する
 		int userId = userService.getUserIdByGoogleSub(googleSub);
 		
-		// ログイン中ユーザーのTodo一覧を取得する
-		List<TodoEntity> todos = todoService.getTodoList(userId);
+		// 未完了タスクを取得する
+		List<TodoEntity> todos = todoService.getTodoListByState(userId, false);
 
 		// HTML側でuserNameとして使用できるようにする
 		model.addAttribute("userName", userName);
 		model.addAttribute("todos", todos);
+		model.addAttribute("currentPage", "incomplete");
+		
+		// templates/view/todos.htmlを表示する
+		return "view/todos";
+	}
+	
+	/**
+	 * 完了Todo一覧画面を表示する
+	 */
+	@GetMapping("/todos/completed")
+	public String completed(Model model,
+							@AuthenticationPrincipal OidcUser oidcUser) {
+		
+		// Googleログイン情報から表示画面用のユーザー名を取得する
+		String userName = oidcUser.getAttribute("name");
+		
+		// Googleログインユーザーの一意IDを取得する
+		String googleSub = oidcUser.getSubject();
+		
+		// google_subからusersテーブルのidを取得する
+		int userId = userService.getUserIdByGoogleSub(googleSub);
+		
+		// 未完了タスクを取得する
+		List<TodoEntity> todos = todoService.getTodoListByState(userId, true);
+
+		// HTML側でuserNameとして使用できるようにする
+		model.addAttribute("userName", userName);
+		model.addAttribute("todos", todos);
+		model.addAttribute("currentPage", "completed");
 		
 		// templates/view/todos.htmlを表示する
 		return "view/todos";
@@ -68,13 +96,11 @@ public class TodoController {
 	 * 追加タスクをDBに登録する
 	 */
 	@PostMapping("/add")
-	public String addTask(
-			@RequestParam String title,
-			@RequestParam(required = false) String memo,
-			@RequestParam(required = false) String dueDate,
-			@RequestParam String priority,
-			@AuthenticationPrincipal OidcUser oidcUser
-			) {
+	public String addTask(@RequestParam String title,
+						  @RequestParam(required = false) String memo,
+						  @RequestParam(required = false) String dueDate,
+						  @RequestParam String priority,
+						  @AuthenticationPrincipal OidcUser oidcUser) {
 		
 		// Googleログインユーザーの一意IDを取得する
 		String googleSub = oidcUser.getSubject();
@@ -108,10 +134,9 @@ public class TodoController {
 	 */
 	@PostMapping("/todos/{id}/state")
 	@ResponseBody
-	public void updateTaskState(
-			@PathVariable("id") int id,
-			@RequestParam boolean state,
-			@AuthenticationPrincipal OidcUser oidcUser) {
+	public void updateTaskState(@PathVariable("id") int id,
+							    @RequestParam boolean state,
+							    @AuthenticationPrincipal OidcUser oidcUser) {
 		
 		// Googleログインユーザーの一意IDを取得する
 		String googleSub = oidcUser.getSubject();
@@ -129,7 +154,7 @@ public class TodoController {
 	@PostMapping("/todos/{id}/delete")
 	@ResponseBody
 	public void deleteTask(@PathVariable("id") int id,
-			@AuthenticationPrincipal OidcUser oidcUser) {
+						   @AuthenticationPrincipal OidcUser oidcUser) {
 		
 		// Googleログインユーザーの一意IDを取得する
 		String googleSub = oidcUser.getSubject();
@@ -147,11 +172,11 @@ public class TodoController {
 	@PostMapping("/todos/{id}/edit")
 	@ResponseBody
 	public void editTask(@PathVariable("id") int id,
-						@RequestParam String title,
-						@RequestParam(required = false) String memo,
-						@RequestParam(required = false) String dueDate,
-						@RequestParam String priority,
-						@AuthenticationPrincipal OidcUser oidcUser) {
+						 @RequestParam String title,
+						 @RequestParam(required = false) String memo,
+						 @RequestParam(required = false) String dueDate,
+						 @RequestParam String priority,
+						 @AuthenticationPrincipal OidcUser oidcUser) {
 		
 		// Googleログインユーザーの一意IDを取得する
 		String googleSub = oidcUser.getSubject();

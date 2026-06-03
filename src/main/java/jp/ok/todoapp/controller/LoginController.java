@@ -22,6 +22,7 @@ public class LoginController {
     		return "redirect:/todos";
     	}
     	
+    	// 未ログインの場合はログイン画面を表示する
         return "view/login";
     }
 }
